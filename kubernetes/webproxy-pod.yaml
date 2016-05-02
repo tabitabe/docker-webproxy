@@ -7,9 +7,16 @@ metadata:
     project: valuphone
     role: reverse-proxy
 spec:
+  volumes:
+    - name: api-tls
+      secret:
+        secretName: api-tls
+    - name: my-tls
+      secret:
+        secretName: my-tls
   containers:
-    - name: nginx
-      image: nginx
+    - name: webproxy
+      image: callforamerica/webproxy
       imagePullPolicy: Always
       ports:
         - name: http
@@ -18,6 +25,13 @@ spec:
         - name: https
           protocol: TCP
           containerPort: 443
+        - name: crossbar-tls
+          protocol: TCP
+          containerPort: 8443
+      volumeMounts:
+        - name: api-tls
+          readOnly: true
+          mountPath: /etc/secrets/tls
       # resources:
       #   requests:
       #     cpu: 2

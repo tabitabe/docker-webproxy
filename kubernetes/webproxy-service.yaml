@@ -20,3 +20,7 @@ spec:
       protocol: TCP
       port: 443
       nodePort: 443
+    - name: crossbar-tls
+      protocol: TCP
+      port: 8443
+      nodePort: 8443
