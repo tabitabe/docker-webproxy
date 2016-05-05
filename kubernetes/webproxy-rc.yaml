@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: webproxy
+  labels:
+    app: webproxy
+    project: valuphone
+    role: reverse-proxy
+spec:
+  replicas: 1
+  selector:
+    app: webproxy
+    project: valuphone
+  template:
+    metadata:
+      name: webproxy
+      labels:
+        app: webproxy
+        project: valuphone
+    spec:
+      volumes:
+        - name: combo-tls
+          secret:
+            secretName: combo-tls
+      containers:
+        - name: webproxy
+          image: callforamerica/webproxy
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 80
+            - name: https
+              protocol: TCP
+              containerPort: 443
+            - name: crossbar-tls
+              protocol: TCP
+              containerPort: 8443
+          volumeMounts:
+            - name: combo-tls
+              readOnly: true
+              mountPath: /etc/secrets/tls
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 1
+              memory: 1G
+            limits:
+              cpu: 1
+              memory: 1G 
+          # readinessProbe:
+          #   httpGet:
+          #     path: /monster-ui
+          #     port: 80
+          #   initialDelaySeconds: 15
+          #   timeoutSeconds: 3
+          # livenessProbe:
+          #   httpGet:
+          #     path: /monster-ui
+          #     port: 80
+          #   initialDelaySeconds: 15
+          #   timeoutSeconds: 3
+      restartPolicy: Always

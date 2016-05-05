@@ -25,6 +25,7 @@ spec:
         - name: crossbar-tls
           protocol: TCP
           containerPort: 8443
+      # args: ["tail", "-f", "/dev/null"]
       volumeMounts:
         - name: combo-tls
           readOnly: true
