@@ -19,9 +19,9 @@ spec:
         project: valuphone
     spec:
       volumes:
-        - name: combo-tls
+        - name: tls
           secret:
-            secretName: combo-tls
+            secretName: webproxy-tls
       containers:
         - name: webproxy
           image: callforamerica/webproxy
@@ -36,7 +36,7 @@ spec:
               protocol: TCP
               containerPort: 8443
           volumeMounts:
-            - name: combo-tls
+            - name: tls
               readOnly: true
               mountPath: /etc/secrets/tls
           imagePullPolicy: Always
