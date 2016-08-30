@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+
+. ~/.bashrc
+
+# options: debug info notice warn error crit alert emerg
+: ${NGINX_LOG_LEVEL:=info}
+
+# options: on off
+: ${NGINX_ACCESS_LOG:=on}
+
+
+echo "Rewriting configuration based on environment ..."
+if [ "$ENVIRONMENT" == "local" ]; then
+    echo "Local environment: disabling ssl configuration ..."
+    sed -ir '/ssl_/d' /etc/nginx/nginx.conf
+fi
+
+
+echo "Rewriting debug_log to: $NGINX_LOG_LEVEL ..."
+sed -ir "/error_log/s/warn/$NGINX_LOG_LEVEL/" /etc/nginx/nginx.conf
+
+
+if [ "$NGINX_ACCESS_LOG" == "off" ]; then
+    echo "Setting access_log to: $NGINX_ACCESS_LOG ..."
+    sed -ir '/access_log/s/\/dev\/stdout     main/                off/' \
+        /etc/nginx/nginx.conf
+fi
+
+cat /etc/nginx/nginx.conf
+
+
+echo "Ensuring permissions ..."
+chown -R nginx:nginx /etc/nginx/nginx.conf
+
+
+echo "Starting nginx ..."
+cd ~
+    exec nginx -g 'daemon off;' 2>&1
