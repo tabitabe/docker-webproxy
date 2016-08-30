@@ -51,7 +51,7 @@ launch:
 	@docker run -d --name $(NAME) -h docker.local -e "ENVIRONMENT=local" -p "80:80" --cap-add NET_ADMIN $(LOCAL_TAG)
 
 launch-net:
-	@docker run -d --name $(NAME) -h docker.local -e "ENVIRONMENT=local" --network=local --net-alias docker.local $(LOCAL_TAG)
+	@docker run -d --name $(NAME) -h docker.local -e "ENVIRONMENT=local" -p "80:80" --network=local --net-alias docker.local $(LOCAL_TAG)
 
 create-network:
 	@docker network create -d bridge local
