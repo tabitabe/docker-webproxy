@@ -13,8 +13,23 @@ set -e
 
 echo "Rewriting configuration based on environment ..."
 if [ "$ENVIRONMENT" == "local" ]; then
-    echo "Local environment: disabling ssl configuration ..."
-    sed -ir '/ssl_/d' /etc/nginx/nginx.conf
+    echo "Local environment: generating self signed certs ..."
+    mkdir -p /etc/ssl/certs
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /etc/ssl/certs/local-key.pem \
+        -out /etc/ssl/certs/local-cert.pem \
+        -subj '/C=US/ST=New York/L=New York/O=Valuphone/OU=Ops/CN=docker.local/
+        emailAddress=nobody@docker.local/
+        subjectAltName=DNS.1=my.docker.local,
+        DNS.2=kzui.docker.local,
+        DNS.3=api.valuphone.com
+        DNS.4=docker.local'
+
+    sed -ir '/ssl_certificate /s/secrets\/tls\/chain/ssl\/certs\/local-cert.pem/' \
+        /etc/nginx/nginx.conf
+    sed -ir '/ssl_certificate_key/s/secrets\/tls\/key/ssl\/certs\/local-key.pem/' \
+        /etc/nginx/nginx.conf
+    sed -ir '/ssl_trusted_certificate/d' /etc/nginx/nginx.conf
 fi
 
 
