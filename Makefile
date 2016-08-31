@@ -78,6 +78,9 @@ rmi:
 	@docker rmi $(LOCAL_TAG)
 	@docker rmi $(REMOTE_TAG)
 
+nginx-reload:
+	kubectl exec $(shell kubectl get po | grep webproxy | cut -d' ' -f1) -- nginx -s reload
+
 kube-deploy:
 	@kubectl create -f kubernetes/$(NAME)-deployment.yaml --record
 
